@@ -76,7 +76,8 @@ class Application {
         if (obj[key]) injector.register(key, obj[key]);
       });
     };
-    loadService(Object.assign({}, this.services, this.dservices));
+    loadService(this.services);
+    loadService(this.dservices);
 
     // run!
     const clean = () => injector.destory();
