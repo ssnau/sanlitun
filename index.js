@@ -41,7 +41,7 @@ class Application {
   }
 
   handleRequest(req, res) {
-		const context = Object.create({});
+    const context = Object.create({});
     const injector = injecting();
     context.injector = injector;
     const mws = this.mws.concat(noop).map(fn => injecting.proxy(fn));

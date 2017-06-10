@@ -9,7 +9,16 @@
   "author": "ssnau",
   "license": "MIT",
   "dependencies": {
-    "injecting": "^2.5.0",
+    "injecting": "^2.5.1",
     "xkit": "^1.1.2"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ssnau/sanlitun.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ssnau/sanlitun/issues"
+  },
+  "homepage": "https://github.com/ssnau/sanlitun#readme"
 }
