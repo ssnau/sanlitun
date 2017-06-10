@@ -1,0 +1,11 @@
+{
+  "name": "sanlitun",
+  "version": "1.0.0",
+  "description": "who am i",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "author": "ssnau",
+  "license": "MIT"
+}
