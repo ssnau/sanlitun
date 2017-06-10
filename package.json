@@ -7,5 +7,9 @@
     "test": "npm test"
   },
   "author": "ssnau",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "injecting": "^2.5.0",
+    "xkit": "^1.1.2"
+  }
 }
