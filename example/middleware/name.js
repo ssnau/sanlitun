@@ -1,6 +1,4 @@
-module.exports = function * (user, context, next) {
-  console.log('name enter');
-  this.body = user.getName();
+module.exports = function * (app, user, context, req, next) {
+  context.body = user.getName();
   yield next();
-  console.log('name leave');
 };

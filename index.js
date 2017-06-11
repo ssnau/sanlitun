@@ -9,8 +9,11 @@ const loadRecipe = require('./recipe');
 
 class Application {
   constructor(config = {}) {
-    this.mws = [];
-    this.dmws = [];
+    this.mws = [];  // default mws
+    this.dmws = []; // dynamic mws
+    // feel free to override cmws if you
+    // want to controll router your self
+    this.cmws = [];
     this.services = {};
     this.dservices = {};
     this.config = config;
@@ -19,15 +22,23 @@ class Application {
     if (config.isDev) this.isDev = true;
   }
 
+  // override me if you want to do some setup work
+  // before server starts
+  beforeListen() {}
+
   listen(port) {
+    // lazy load recipes, you have enough time to
+    // customize sanlitun before its server starts
     loadRecipe(this, {
       controllerPath: this.config.controllerPath,
       servicePath: this.config.servicePath,
       middlewarePath: this.config.middlewarePath
     });
-    this.server = http.createServer(this.handleRequest);
-    console.log('listening on ' + port);
-    return promiseCall([this.server.listen, this.server], port);
+    this.beforeListen();
+    const server = http.createServer(this.handleRequest);
+    this.server = server;
+    return promiseCall([server.listen, server], port || 0)
+      .then(() => console.log('listening on ' + server.address().port));
   }
 
   register(name, fn) { this.services[name] = fn; }
@@ -37,15 +48,13 @@ class Application {
   // but feel free to operate directly with `this.mws`
   // as you may want to load / unload some middlewares
   // during dev mode
-  use(fn) {
-    this.mws.push(fn);
-  }
+  use(fn) { this.mws.push(fn); }
 
   // The final place to handle response
   // assign `respond = false` to bypass this function
   respond(context, res, req) {
     if (context.respond === false) return;
-    res.end(context.body);
+    res.end(context.body || 'not found');
   }
 
   handleRequest(req, res) {
@@ -56,7 +65,9 @@ class Application {
     // compose middlewares
     const mws = this.mws
       .concat(this.dmws)
+      .concat(this.cmws)
       .concat(noop)
+      .filter(Boolean)
       .map(fn => injecting.proxy(fn));
     const len = mws.length;
     for (let i = 0; i < len; i++) {
@@ -68,6 +79,8 @@ class Application {
     // a: it can protect from user code overriding
     //    built-in services and raise error
     injector.register('context', context);
+    injector.register('injector', injector);
+    injector.register('$', () => name => injector.get(name)); // shortcut
     injector.register('req', req);
     injector.register('res', res);
     injector.register('app', this);

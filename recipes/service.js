@@ -1,4 +1,5 @@
 const path = require('path');
+const { r } = require('../util');
 
 function setup(app, spath, files) {
   app.dservices = {};
@@ -6,7 +7,7 @@ function setup(app, spath, files) {
     const name = path.relative(spath, file)
       .replace(/\//g, '$')
       .replace(/\.js$/, '');
-    app.dservices[name] = require(file);
+    app.dservices[name] = r(file);
   });
 }
 

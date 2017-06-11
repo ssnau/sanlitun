@@ -20,9 +20,14 @@ function process(app, rpath, loader) {
     pattern: filter,
     name: loader.name,
     callback: f => {
-      console.log('changes:', f);
+      const start = Date.now();
       delete require.cache[path.join(rpath, f)];
-      loader.setup(app, rpath, gf());
+      try {
+        loader.setup(app, rpath, gf());
+      } catch (e) {
+        console.error(`reload ${loader.name} error:`, e.stack);
+      }
+      console.log(`[${Date.now() - start}ms] reload ${loader.name}`);
     }
   });
 }

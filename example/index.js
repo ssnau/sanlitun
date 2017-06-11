@@ -3,15 +3,17 @@ let Application = require('../');
 let app = new Application({
   isDev: true,
   servicePath: path.join(__dirname, 'service'),
-  middlewarePath: path.join(__dirname, 'middleware')
-  // controllerPath: path.join(__dirname, 'controller'),
+  middlewarePath: path.join(__dirname, 'middleware'),
+  controllerPath: path.join(__dirname, 'controller')
 });
 
 app.use(function * (context, next) {
+  console.time('x');
   context.body = 'hello';
   console.log('#1 enter');
   yield next();
   console.log('#1 leave');
+  console.timeEnd('x');
 });
 
 app.use(function * (context, next) {
