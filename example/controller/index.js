@@ -1,9 +1,10 @@
 module.exports = [
   {
-    url: '/test/:req/:username',
-    * controller(context, $) {
-      const { req, username } = context.params;
-      context.body = 'test:' + req + ':' + username;
+    url: '/test',
+    * controller(context, req, $, res) {
+      console.log('####', context.path);
+      console.log(context.query);
+      context.body = 'test:' + req.url;
     }
   },
   {

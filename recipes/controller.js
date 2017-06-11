@@ -32,8 +32,7 @@ function setup(app, mpath, files) {
   app.pages = pages;
 
   function controller(req, context, injector) {
-    const { url } = req;
-    const match = router.match(url);
+    const match = router.match(context.path);
     const controllers = match && match.node && match.node.controllers;
     if (!controllers) return console.error('no controller found for ' + url);
 

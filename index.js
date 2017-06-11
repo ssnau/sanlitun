@@ -6,6 +6,7 @@ const {
   noop
 } = require('./util');
 const loadRecipe = require('./recipe');
+const builtin = require('./builtin');
 
 class Application {
   constructor(config = {}) {
@@ -54,13 +55,17 @@ class Application {
   // assign `respond = false` to bypass this function
   respond(context, res, req) {
     if (context.respond === false) return;
-    res.end(context.body || 'not found');
+    if (res.headersSent) return;
+    const body = context.body || 'not found';
+    // responses
+    if (Buffer.isBuffer(body)) return res.end(body);
+    if ('string' == typeof body) return res.end(body);
+    if (body instanceof Stream) return body.pipe(res);
+    res.end(body);
   }
 
   handleRequest(req, res) {
-    const context = {};
     const injector = injecting();
-    context.injector = injector;
 
     // compose middlewares
     const mws = this.mws
@@ -78,12 +83,12 @@ class Application {
     // q: why not Object.assign services first?
     // a: it can protect from user code overriding
     //    built-in services and raise error
-    injector.register('context', context);
     injector.register('injector', injector);
     injector.register('$', () => name => injector.get(name)); // shortcut
     injector.register('req', req);
     injector.register('res', res);
     injector.register('app', this);
+    builtin(injector);
     // load services
     const loadService = obj => {
       Object.keys(obj).forEach(key => {
@@ -95,11 +100,15 @@ class Application {
 
     // run!
     const clean = () => injector.destory();
-    injector.invoke(mws[0])
-      .then(
-        _ => this.respond(context, res, req),
-        e => this.onerror(e, context, req, res))
-      .then(clean, clean);
+    res.statusCode = 404;
+    return injector.invoke((context) => {
+      return injector.invoke(mws[0])
+             .then(
+              _ => this.respond(context, res, req),
+              e => this.onerror(e, context, req, res))
+            .then(clean, clean);
+    })
+
   }
 
   // please override this function
