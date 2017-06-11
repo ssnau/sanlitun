@@ -1,6 +1,5 @@
 const readdir = require('xkit/fs/readdir');
 const watch = require('xkit/fs/watch');
-const { noop } = require('./util');
 const path = require('path');
 
 function process(app, rpath, loader) {
@@ -9,7 +8,7 @@ function process(app, rpath, loader) {
   const filter = loader.filter || /\.js$/;
   // ignore files and folders start with '_'
   // ignore files with `spec.js`
-  const gf = () => 
+  const gf = () =>
     readdir(rpath, { pattern: f => path.relative(rpath, f).indexOf('/_') === -1 })
     .filter(f => !/spec\.js/.test(f))
     .filter(f => /js$/.test(f));
@@ -20,16 +19,16 @@ function process(app, rpath, loader) {
     path: rpath,
     pattern: filter,
     name: loader.name,
-    callback: (f) => {
+    callback: f => {
       console.log('changes:', f);
       delete require.cache[path.join(rpath, f)];
-      loader.setup(app, rpath, gf())
+      loader.setup(app, rpath, gf());
     }
-  })
+  });
 }
 
-module.exports = function (app, paths) {
+module.exports = function(app, paths) {
   process(app, paths.middlewarePath, require('./recipes/middleware'));
   process(app, paths.servicePath, require('./recipes/service'));
   process(app, paths.controllerPath, require('./recipes/controller'));
-}
+};

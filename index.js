@@ -3,18 +3,19 @@ const injecting = require('injecting');
 const promiseCall = require('xkit/util/promise-call');
 const {
   last,
-  noop,
+  noop
 } = require('./util');
 const loadRecipe = require('./recipe');
 
 class Application {
-  constructor(config={}) {
+  constructor(config = {}) {
     this.mws = [];
     this.dmws = [];
     this.services = {};
     this.dservices = {};
-    this.handleRequest = this.handleRequest.bind(this);
     this.config = config;
+    this.server = null;
+    this.handleRequest = this.handleRequest.bind(this);
     if (config.isDev) this.isDev = true;
   }
 
@@ -22,7 +23,7 @@ class Application {
     loadRecipe(this, {
       controllerPath: this.config.controllerPath,
       servicePath: this.config.servicePath,
-      middlewarePath: this.config.middlewarePath,
+      middlewarePath: this.config.middlewarePath
     });
     this.server = http.createServer(this.handleRequest);
     console.log('listening on ' + port);
@@ -51,7 +52,7 @@ class Application {
     const context = {};
     const injector = injecting();
     context.injector = injector;
-    
+
     // compose middlewares
     const mws = this.mws
       .concat(this.dmws)
@@ -64,14 +65,14 @@ class Application {
       };
     }
     // q: why not Object.assign services first?
-    // a: it can protect from user code overriding 
+    // a: it can protect from user code overriding
     //    built-in services and raise error
     injector.register('context', context);
     injector.register('req', req);
     injector.register('res', res);
     injector.register('app', this);
     // load services
-    const loadService = (obj) => {
+    const loadService = obj => {
       Object.keys(obj).forEach(key => {
         if (obj[key]) injector.register(key, obj[key]);
       });

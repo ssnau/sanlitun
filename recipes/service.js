@@ -6,12 +6,12 @@ function setup(app, spath, files) {
     const name = path.relative(spath, file)
       .replace(/\//g, '$')
       .replace(/\.js$/, '');
-    app.dservices[name] =  require(file);
+    app.dservices[name] = require(file);
   });
 }
 
 module.exports = {
   setup,
   filter: /js$/,
-  name: 'service',
+  name: 'service'
 };

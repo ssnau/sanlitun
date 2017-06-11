@@ -1,12 +1,7 @@
 class User {
-  constructor(context) {
-
-  }
-
   getName() {
-      return 'jack';
+    return 'jack';
   }
-
 }
 
 module.exports = User;

@@ -4,7 +4,7 @@ function last(array) {
 }
 
 function safe(fn) {
-  try { return fn() } catch (e) { return undefined; }
+  try { return fn(); } catch (e) { return undefined; }
 }
 
 function noop() {}
@@ -12,5 +12,5 @@ function noop() {}
 module.exports = {
   last,
   noop,
-  safe,
-}
+  safe
+};
